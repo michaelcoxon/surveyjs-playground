@@ -1,5 +1,8 @@
-import { Model, Question, QuestionTextModel, Serializer, SurveyModel, type ValueChangingEvent } from 'survey-core';
+import { Model, Serializer, SurveyModel } from 'survey-core';
 import surveyJson from './MySurveyModel';
+import { isDateQuestion } from './helpers/QuestionGuards/isDateQuestion';
+import { isTextQuestion } from './helpers/QuestionGuards/isTextQuestion';
+import { onValueChangingCastStringDateToNativeDate } from './helpers/onValueChangingCastStringDateToNativeDate';
 
 
 export default class SurveyService
@@ -10,7 +13,7 @@ export default class SurveyService
 
         // wire up events
         model.onComplete.add(SurveyService.onSurveyComplete);
-        model.onValueChanging.add(SurveyService.onInputDateValueChanging);
+        model.onValueChanging.add(onValueChangingCastStringDateToNativeDate);
 
         // dump surveyJson schema out to console
         console.log(Serializer.generateSchema());
@@ -30,14 +33,6 @@ export default class SurveyService
         );
     };
 
-    private static onInputDateValueChanging = function (_sender: SurveyModel, options: ValueChangingEvent)
-    {
-        if (isDateQuestion(options.question) && typeof options.value === "string")
-        {
-            options.value = new Date(options.value);
-        }
-    };
-
     private static saveSurveyResults(url: string, json: object)
     {
         console.info(url, {
@@ -50,12 +45,3 @@ export default class SurveyService
     }
 }
 
-function isTextQuestion(question?: Question): question is QuestionTextModel
-{
-    return question?.getType() == 'text';
-}
-
-function isDateQuestion(question?: Question): question is QuestionTextModel
-{
-    return isTextQuestion(question) && question.inputType === "date";
-}
