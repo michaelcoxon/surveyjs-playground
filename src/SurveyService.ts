@@ -1,7 +1,5 @@
 import { Model, Serializer, SurveyModel } from 'survey-core';
 import surveyJson from './MySurveyModel';
-import { isDateQuestion } from './helpers/QuestionGuards/isDateQuestion';
-import { isTextQuestion } from './helpers/QuestionGuards/isTextQuestion';
 import { onValueChangingCastStringDateToNativeDate } from './helpers/onValueChangingCastStringDateToNativeDate';
 
 
